@@ -1,7 +1,12 @@
-streamlit>=1.30
-torch>=1.13
-torchvision>=0.14
+# Install torch first
+torch==2.0.1
+torchvision==0.15.2
+
+# Then detectron2
 detectron2 @ git+https://github.com/facebookresearch/detectron2.git
+
+# Rest of the packages
+streamlit>=1.30
 opencv-python
 pycocotools
 Pillow
