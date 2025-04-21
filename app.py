@@ -1,17 +1,18 @@
 import streamlit as st
+import json
+import time
+from PIL import Image
+import os
+import sys
+import gdown
+
 st.set_page_config(
     page_title="2D Floorplan Vectorizer",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-import json
-import time
-from PIL import Image
-import os
-import sys
-
-# print("Streamlit App Starting...")
+print("Streamlit App Starting...")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -19,16 +20,32 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_DIR = os.path.join(BASE_DIR, "rcnn_model", "uploads")
 MODEL_DIR = os.path.join(BASE_DIR, "rcnn_model", "scripts")
 JSON_DIR = os.path.join(BASE_DIR, "rcnn_model", "results")
+OUTPUT_DIR = os.path.join(BASE_DIR, "rcnn_model", "output")
 SAMPLE_DIR = os.path.join(BASE_DIR, "rcnn_model", "sample")
 logo_path = os.path.join(BASE_DIR, "public", "logo.png")
+model_path = os.path.join(OUTPUT_DIR, "model_final.pth")
 
-# Make folders if they don't exist
+# Google Drive file download link
+GOOGLE_DRIVE_FILE_ID = "1yr64AOgaYZPTcQzG6cxG6lWBENHR9qjW"
+GDRIVE_URL = f"https://drive.google.com/uc?id={GOOGLE_DRIVE_FILE_ID}"
+
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 os.makedirs(JSON_DIR, exist_ok=True)
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# Import rcnn_run.py -- > this is the main model file for running predictions on single or batch images
+# DOWNLOAD MODEL IF MISSING
+
+if not os.path.exists(model_path):
+    print("Model file not found! Downloading from Google Drive...")
+    try:
+        gdown.download(GDRIVE_URL, model_path, quiet=False)
+        print("Model downloaded successfully.")
+    except Exception as e:
+        print(f"Failed to download model: {e}")
+
 sys.path.append(MODEL_DIR)
 from rcnn_model.scripts.rcnn_run import main, write_config
+
 
 st.markdown(
     """
@@ -50,7 +67,6 @@ st.markdown(
 
 st.image(logo_path, width=250)
 st.markdown("<div class='header-title'>2D Floorplan Vectorizer</div>", unsafe_allow_html=True)
-
 st.subheader("Upload your Floorplan Image")
 uploaded_file = st.file_uploader("Choose an image", type=["png", "jpg", "jpeg"])
 
@@ -62,13 +78,13 @@ if "json_output" not in st.session_state:
 col1, col2 = st.columns([1, 2])
 
 if uploaded_file is not None:
-    # print("File Uploaded:", uploaded_file.name)
+    print("File Uploaded:", uploaded_file.name)
 
     # Save uploaded file
     uploaded_path = os.path.join(UPLOAD_DIR, uploaded_file.name)
     with open(uploaded_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
-    # print("Uploaded file saved at:", uploaded_path)
+    print("Uploaded file saved at:", uploaded_path)
 
     # Display uploaded image
     with col1:
@@ -83,29 +99,28 @@ if uploaded_file is not None:
             progress_bar = st.progress(0)
             status_text = st.empty()
 
-            # Running Model Here 
+            # Run Model
             input_image = uploaded_path
             output_json_name = uploaded_file.name.replace(".png", "_result.json").replace(".jpg", "_result.json").replace(".jpeg", "_result.json")
             output_image_name = uploaded_file.name.replace(".png", "_result.png").replace(".jpg", "_result.png").replace(".jpeg", "_result.png")
 
             cfg = write_config()
-            # print("Model config created. Running model...")
+            print("Model config created. Running model...")
 
-            # Simulating Progress Bar
+            # Simulate progress bar
             for i in range(1, 30):
                 time.sleep(0.01)
                 progress_bar.progress(i)
                 status_text.text(f"Preprocessing: {i}%")
 
             main(cfg, input_image, output_json_name, output_image_name)
-            # print("Model run complete.")
+            print("Model run complete.")
 
-            # Prepare Output Paths
             output_json_path = os.path.join(JSON_DIR, output_json_name)
             output_image_path = os.path.join(JSON_DIR, output_image_name)
 
             while not os.path.exists(output_json_path):
-                # print("Waiting for JSON output...")
+                print("Waiting for JSON output...")
                 time.sleep(0.5)
 
             for i in range(30, 100):
@@ -121,14 +136,12 @@ if uploaded_file is not None:
             if os.path.exists(output_json_path):
                 with open(output_json_path, "r") as jf:
                     st.session_state.json_output = json.load(jf)
-                    # print("JSON Output Loaded Successfully.")
+                    print("JSON Output Loaded Successfully.")
             else:
                 st.session_state.json_output = {"error": "JSON output not generated."}
-                # print("JSON output missing.")
+                print("JSON output missing.")
 
             st.session_state.processing_complete = True
-
-        # DISPLAY Output Image and JSON file
 
         out_col1, out_col2 = st.columns(2)
 
