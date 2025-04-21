@@ -1,0 +1,27 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Caches
+.cache/
+.ipynb_checkpoints/
+
+# Virtual environment
+venv/
+.env/
+*.env
+
+# MacOS system files
+.DS_Store
+
+# Model files
+*.pth
+*.ckpt
+
+# Streamlit temp files
+.streamlit/
+
+# Uploads and results
+rcnn_model/uploads/
+rcnn_model/results/

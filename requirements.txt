@@ -1,0 +1,7 @@
+streamlit>=1.30
+torch>=1.13
+torchvision>=0.14
+detectron2 @ git+https://github.com/facebookresearch/detectron2.git
+opencv-python
+pycocotools
+Pillow

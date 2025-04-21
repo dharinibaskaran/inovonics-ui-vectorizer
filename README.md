@@ -1,69 +1,75 @@
-# Inovonics - Vectorizing 2D Floor Plans
+# 2D Floorplan Vectorizer
 
+A Streamlit web app that allows you to upload 2D floorplan images and automatically vectorize them into COCO-style annotations using a trained Mask R-CNN model.
 
-**App** : https://inovonics-ui-vectorizer.streamlit.app/
+---
 
-**Repo** : https://github.com/dharinibaskaran/inovonics-ui-vectorizer
+## How to Run the App
 
-**Demo** : [UI Demo Recording](https://drive.google.com/file/d/1eUei_fAmglMts_uOrRgPS-scszXtKun1/view?usp=drive_link)
+1. **Clone the repository:**
 
-**Introduction**
+    ```bash
+    git clone <this-repo-link>
+    cd inovonics-ui-vectorizer
+    ```
 
-The 2D Floorplan Vectorizer is a web-based application designed to process floorplan images and generate structured JSON data. The application allows users to upload floorplan images, processes them using an external model, and provides the extracted vectorized data in a structured format. It features a clean and minimalist user interface with enhanced usability, including a progress bar, JSON display, and a download option.
+2. **Install the required Python packages:**
 
-**Key Features**
+    ```bash
+    pip install -r requirements.txt
+    ```
 
+3. **Download the pretrained model:**
 
-**File Upload System**
+    - Download `model_final.pth` from [Google Drive here](https://drive.google.com/file/d/1yr64AOgaYZPTcQzG6cxG6lWBENHR9qjW/view?usp=sharing).
+    - Place it inside:
 
-Users can upload PNG, JPG, and JPEG images of floor plans.
-The uploaded image is displayed for review.
+      ```plaintext
+      inovonics-ui-vectorizer/rcnn_model/output/model_final.pth
+      ```
 
+4. **Run the app:**
 
-**Processing Workflow**
+    ```bash
+    streamlit run app.py
+    ```
 
-Once an image is uploaded, a simulated progress bar provides real-time feedback on processing status.
-The application is designed to integrate with an external Python script (model) that processes the image and generates a corresponding data.json file.
+5. Open your browser at [http://localhost:8501](http://localhost:8501) to start using the app!
 
+---
 
-**JSON Display & Download**
+## Project Structure
 
-<li>
-The extracted vectorized data is displayed in a scrollable JSON viewer.
-<li>
-Users can download the JSON file for further use.
-
-<br>
-
-**User Interface Enhancements**
-
-<li>
-Minimalist UI Design: A clean interface with soft pastel color gradients.
-<li>
-Scrollable JSON Viewer: Ensures large JSON data remains easy to navigate.
-<li>
-Dynamic Progress Bar: Provides visual feedback during processing.
-<li>
-Custom Styling: Improved button styles, structured layout, and responsive design.
-
-<br>
-
-**Technology Stack**
-<li>
-Frontend: Streamlit (for UI and interaction)
-<li>
-Backend Processing: External Python script for image processing and JSON generation
-<li>
-Styling: Custom CSS for enhanced UI aesthetics
-
-<br>
-
-**Why Streamlit Over React?**
- 
-Streamlit was chosen over React for its simplicity, quick deployment, and seamless Python integration. Unlike React, Streamlit provides built-in UI components like file uploaders, progress bars, and JSON viewers, reducing development time. Since the project is data-driven and heavily relies on Python-based processing, Streamlit allows direct interaction with the backend model without needing a separate API layer, making it the ideal choice for this workflow.
-
-**Conclusion**
-
-Moving forward, the component to include the processed image will also be integrated to this UI. The 2D Floorplan Vectorizer provides an efficient solution for converting floorplan images into structured data. With its user-friendly interface and structured workflow, it simplifies the process of extracting and utilizing vectorized floorplan data for further analysis and applications. The decision to use Streamlit over React ensures ease of development, better Python integration, and faster deployment for data-intensive workflows.
-
-
+```plaintext
+inovonics-ui-vectorizer/
+├── app.py                     # Streamlit frontend app
+├── public/
+│   └── logo.png                # App logo
+├── rcnn_model/
+│   ├── extraction/             # Extract information from uploaded png image
+│   │   └── annotation_builder.py      
+│   │   └── floorplan_sampler.py
+│   │   └── from_labelme_runner.py
+│   │   └── svg_to_json.py   
+│   ├── output/                 # Empty folder while cloning. Place the pth file here
+│   ├── preprocessing/          # Preprocess the image before sending to model
+│   │   └── cleaning_images.py  
+│   │   └── cleaning_single_image.py 
+│   │   └── splitting_dataset.py
+│   │   └── svg_to_yolo.py    
+│   ├── results/                # Empty folder while cloning. The resulting image and JSON will be stored here
+│   ├── sample/                 # Sample images for the model       
+│   ├── scripts/                # Model training, evaluation and inference. Streamlit runs the rcnn_run.py file from the frontend
+│   │   └── rcnn_config.py    
+│   │   └── rcnn_eval.py  
+│   │   └── rcnn_full_tuner.py 
+│   │   └── rcnn_run.py  
+│   │   └── rcnn_train.py     
+│   ├── uploads/                # Temporary folder for streamlit to store the user uploaded image
+│   ├── utils/                  # Utility functions during model train and preprocessing
+│   │   └── coco_to_inovonics_json.py
+│   │   └── floorplan_vectorizer_utils.py
+│   │   └── inovonics_ann_builder.py
+├── README.md                   # (this file)
+├── requirements.txt            # Python dependencies
+└── .gitignore                  # Files to ignore during Git commits
