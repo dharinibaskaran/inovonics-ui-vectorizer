@@ -3,7 +3,7 @@ torch==2.0.1
 torchvision==0.15.2
 
 # Pre-built detectron2 wheel
-https://dl.fbaipublicfiles.com/detectron2/wheels/cu118/torch2.0/detectron2-0.6-cp38-cp38-linux_x86_64.whl
+# https://dl.fbaipublicfiles.com/detectron2/wheels/cu118/torch2.0/detectron2-0.6-cp38-cp38-linux_x86_64.whl
 
 # Streamlit and others
 streamlit>=1.30
